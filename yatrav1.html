@@ -106,30 +106,13 @@
 </head>
 <body>
 
-    <footer class="yatra-footer">
-        <div class="footer-content">
-            <p class="built-by">
-                Built with ❤️ for <strong>Kedarnath Yatra 2026</strong> by 
-                <strong>District Magistrate Rudraprayag</strong> | 
-                <span class="ai-power">Powered by Open Source AI</span>
-            </p>
-            
-            <div class="footer-bottom">
-                <span>© 2026 <strong>CHANGE TechLab</strong>. All rights reserved.</span>
-                <nav class="footer-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="mailto:changetechlab@outlook.com">changetechlab@outlook.com</a>
-                </nav>
-            </div>
-        </div>
-    </footer>
+    <header class="yatra-header">
+        <div>Kedarnath Yatra 2026</div>
+        <div class="update-tag">Last Updated: Apr 17, 2026</div>
+    </header>
 
     <!-- Info & Emergency Panel (Left Side) -->
     <div class="info-panel">
-        <h2>Kedarnath Yatra 2026</h2>
-        <div class="subtitle">Last Updated: Apr 17, 2026</div>
-        
         <div class="info-section">
             <div class="info-item">
                 <span>☎️ Yatra Control Room:</span>
@@ -145,18 +128,11 @@
         </div>
 
         <div class="links-section">
-            <a href="#" onclick="alert('Coming soon... Working on it!'); return false;" class="link-btn">
+            <a href="https://rudraprayag.gov.in/kedarnath-yatra-2/" target="_blank" class="link-btn">
                 <span>🌐</span> Tourist Registration Portal
             </a>
-            <a href="#" onclick="alert('Coming soon... Working on it!'); return false;" class="link-btn">
+            <a href="https://rudraprayag.gov.in/kedarnath-yatra-2/" target="_blank" class="link-btn">
                 <span>🚁</span> IRCTC Heli Booking
-            </a>
-            <hr class="divider">
-            <a href="#" onclick="alert('Coming soon... Working on it!'); return false;" class="link-btn dashboard-btn">
-                <span>📊</span> Live Monitoring Dashboard
-            </a>
-            <a href="#" onclick="alert('Coming soon... Working on it!'); return false;" class="link-btn dmr-btn">
-                <span>📝</span> Master DMR Entry
             </a>
         </div>
     </div>
@@ -447,11 +423,35 @@
 
 
     <style>
+        .yatra-header {
+            background: linear-gradient(90deg, #0b0f18 0%, #1a2233 100%);
+            padding: 14px 20px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(79, 172, 254, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2000;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
+        }
+        .yatra-header .update-tag {
+            font-size: 11px;
+            color: #2ecc71;
+            font-weight: 600;
+            padding: 4px 12px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            border-radius: 20px;
+        }
         .yatra-footer {
             background: rgba(10, 14, 23, 0.95);
             color: #8b95a8;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(100, 140, 255, 0.12);
+            border-top: 1px solid rgba(100, 140, 255, 0.12); /* Reverted to border-top */
             font-family: 'Inter', sans-serif;
             text-align: center;
             position: relative;
@@ -503,5 +503,23 @@
             }
         }
     </style>
+    <footer class="yatra-footer">
+        <div class="footer-content">
+            <p class="built-by">
+                Built with ❤️ for <strong>Kedarnath Yatra 2026</strong> by 
+                <strong>District Magistrate Rudraprayag</strong> | 
+                <span class="ai-power">Powered by Open Source AI</span>
+            </p>
+            
+            <div class="footer-bottom">
+                <span>© 2026 <strong>CHANGE TechLab</strong>. All rights reserved.</span>
+                <nav class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="mailto:changetechlab@outlook.com">changetechlab@outlook.com</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
