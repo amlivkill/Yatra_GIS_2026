@@ -69,10 +69,80 @@
             animation: scrollDash 3s linear infinite;
             filter: drop-shadow(0 0 4px rgba(0, 242, 254, 0.8));
         }
+
+        /* ── Info Panel ── */
+        .info-panel {
+            position: absolute; top: 20px; left: 20px; z-index: 1000;
+            background: rgba(10, 14, 23, 0.95);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 12px; padding: 16px;
+            color: #fff; width: 260px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+        .info-panel h2 { margin: 0; font-size: 17px; font-weight: 700; background: linear-gradient(90deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
+        .info-panel .subtitle { font-size: 11px; color: #2ecc71; margin-bottom: 12px; font-weight: 600;}
+        .info-section { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .info-item { display: flex; flex-direction: column; margin-bottom: 8px; }
+        .info-item:last-child { margin-bottom: 0; }
+        .info-item span { color: #8b95a8; font-size: 11px; margin-bottom: 3px;}
+        .info-item a { color: #fff; text-decoration: none; font-weight: 600; font-size: 12px; letter-spacing: 0.5px;}
+        .info-item a:hover { color: #4facfe; }
+        
+        .links-section { display: flex; flex-direction: column; gap: 8px; }
+        .link-btn {
+            display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #e8edf5; text-decoration: none; font-size: 12px;
+            transition: all 0.2s;
+        }
+        .link-btn:hover { background: rgba(79,172,254,0.1); border-color: rgba(79,172,254,0.4); }
+        .link-btn.dashboard-btn { background: rgba(46,204,113,0.1); border-color: rgba(46,204,113,0.3); color: #2ecc71;}
+        .link-btn.dashboard-btn:hover { background: rgba(46,204,113,0.2); }
+        .link-btn.dmr-btn { background: rgba(243,156,18,0.1); border-color: rgba(243,156,18,0.3); color: #f39c12;}
+        .link-btn.dmr-btn:hover { background: rgba(243,156,18,0.2); }
+        .divider { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 4px 0; }
     </style>
 </head>
 <body>
 
+    <!-- Info & Emergency Panel (Left Side) -->
+    <div class="info-panel">
+        <h2>Kedarnath Yatra 2026</h2>
+        <div class="subtitle">Last Updated: Apr 17, 2026</div>
+        
+        <div class="info-section">
+            <div class="info-item">
+                <span>☎️ Yatra Control Room:</span>
+                <div>
+                    <a href="tel:01364-297878">01364-297878</a> &nbsp;|&nbsp; 
+                    <a href="tel:01364-297879">297879</a>
+                </div>
+            </div>
+            <div class="info-item" style="margin-top: 10px;">
+                <span>🚁 Heli Help Line:</span>
+                <a href="tel:+919870963731">+91 98709 63731</a>
+            </div>
+        </div>
+
+        <div class="links-section">
+            <a href="https://registrationandtouristcare.uk.gov.in/" target="_blank" class="link-btn">
+                <span>🌐</span> Tourist Registration Portal
+            </a>
+            <a href="https://www.heliyatra.irctc.co.in/" target="_blank" class="link-btn">
+                <span>🚁</span> IRCTC Heli Booking
+            </a>
+            <hr class="divider">
+            <a href="yatra_dashboard.html" class="link-btn dashboard-btn">
+                <span>📊</span> Live Monitoring Dashboard
+            </a>
+            <a href="dmr_entry.html" class="link-btn dmr-btn">
+                <span>📝</span> Master DMR Entry
+            </a>
+        </div>
+    </div>
+
+    <!-- Sector Control Panel (Right Side) -->
     <div class="control-panel">
         <h3 style="margin:0; color:#4facfe; font-size: 16px;"> GIS Mapping: All 14 Yatra Sectors</h3>
         <p style="font-size: 11px; color: #8b95a8;">Kedarnath Yatra 2026 | District Administration Rudraprayag</p>
