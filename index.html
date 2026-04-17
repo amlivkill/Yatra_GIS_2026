@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>उत्तराखंड RE Hub — Decentralized Renewable Energy GIS</title>
+    <meta name="description" content="Uttarakhand Decentralized Renewable Energy Hub — AI-powered GIS tool for wind, solar, and hybrid microgrid planning across 13 districts. Built by CHANGE TechLab.">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Tokml for KML export -->
+    <script src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header id="topbar">
+        <div class="topbar-left">
+            <button id="sidebar-toggle" class="icon-btn" title="Toggle Sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="brand">
+                <span class="brand-icon">⚡</span>
+                <h1 id="app-title">उत्तराखंड RE Hub</h1>
+                <span class="brand-badge">by CHANGE TechLab</span>
+            </div>
+        </div>
+        <div class="topbar-center">
+            <div class="district-selector">
+                <label for="district-select">🏔️ जिला चुनें:</label>
+                <select id="district-select">
+                    <option value="all">सभी जिले — All Districts</option>
+                    <option value="dehradun">देहरादून — Dehradun</option>
+                    <option value="haridwar">हरिद्वार — Haridwar</option>
+                    <option value="pauri">पौड़ी गढ़वाल — Pauri Garhwal</option>
+                    <option value="tehri">टिहरी गढ़वाल — Tehri Garhwal</option>
+                    <option value="uttarkashi">उत्तरकाशी — Uttarkashi</option>
+                    <option value="chamoli">चमोली — Chamoli</option>
+                    <option value="rudraprayag">रुद्रप्रयाग — Rudraprayag</option>
+                    <option value="almora">अल्मोड़ा — Almora</option>
+                    <option value="nainital">नैनीताल — Nainital</option>
+                    <option value="champawat">चम्पावत — Champawat</option>
+                    <option value="bageshwar">बागेश्वर — Bageshwar</option>
+                    <option value="pithoragarh">पिथौरागढ़ — Pithoragarh</option>
+                    <option value="udhamsingh">ऊधम सिंह नगर — Udham Singh Nagar</option>
+                </select>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button id="btn-export-kml" class="action-btn" title="KML Export">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                KML Export
+            </button>
+            <button id="btn-chat" class="action-btn accent" title="Hindi AI Chat">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                हिंदी Chat
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Sidebar Dashboard -->
+        <aside id="sidebar" class="sidebar open">
+            <div class="sidebar-inner">
+                <!-- Dashboard Header -->
+                <div class="dash-header">
+                    <h2>📊 Energy Dashboard</h2>
+                    <span class="dash-subtitle">District-wise Analysis</span>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card wind">
+                        <div class="stat-icon">💨</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-wind">—</span>
+                            <span class="stat-label">Wind Potential (MW)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card solar">
+                        <div class="stat-icon">☀️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-solar">—</span>
+                            <span class="stat-label">Solar Potential (MW)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card hubs">
+                        <div class="stat-icon">🔋</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-hubs">—</span>
+                            <span class="stat-label">Proposed Hubs</span>
+                        </div>
+                    </div>
+                    <div class="stat-card jobs">
+                        <div class="stat-icon">👷</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-jobs">—</span>
+                            <span class="stat-label">Jobs Created</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agriculture Stats -->
+                <div class="stats-grid" id="agri-stats">
+                    <div class="stat-card agri-1">
+                        <div class="stat-icon">🌱</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-organic-farmers">—</span>
+                            <span class="stat-label">Organic Farmers</span>
+                        </div>
+                    </div>
+                    <div class="stat-card agri-2">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-fpo-count">—</span>
+                            <span class="stat-label">FPO/SHG Clusters</span>
+                        </div>
+                    </div>
+                    <div class="stat-card agri-3">
+                        <div class="stat-icon">🏗️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-polyhouse">—</span>
+                            <span class="stat-label">Polyhouse Units</span>
+                        </div>
+                    </div>
+                    <div class="stat-card agri-4">
+                        <div class="stat-icon">❄️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-cold">—</span>
+                            <span class="stat-label">Cold Storages</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forest Stats -->
+                <div class="stats-grid" id="forest-stats">
+                    <div class="stat-card forest-1">
+                        <div class="stat-icon">🌲</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-forest-area">—</span>
+                            <span class="stat-label">Forest (km²)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card forest-2">
+                        <div class="stat-icon">🌲</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-pine-yield">—</span>
+                            <span class="stat-label">Pine Needle (MT)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card forest-3">
+                        <div class="stat-icon">🏛️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-protected">—</span>
+                            <span class="stat-label">Protected Areas</span>
+                        </div>
+                    </div>
+                    <div class="stat-card forest-4">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-pine-energy">—</span>
+                            <span class="stat-label">Pine Energy (kW)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer Controls -->
+                <div class="panel layer-panel">
+                    <h3>🗂️ Map Layers</h3>
+                    <div class="layer-toggles">
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-wind" checked>
+                            <span class="toggle-slider wind"></span>
+                            <span>💨 Wind Potential</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-solar" checked>
+                            <span class="toggle-slider solar"></span>
+                            <span>☀️ Solar Irradiance</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-microgrid" checked>
+                            <span class="toggle-slider micro"></span>
+                            <span>🔋 Microgrid Hubs</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-services">
+                            <span class="toggle-slider service"></span>
+                            <span>🏭 Village Services</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-flood">
+                            <span class="toggle-slider risk-f"></span>
+                            <span>🌊 Flood Risk</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-landslide">
+                            <span class="toggle-slider risk-l"></span>
+                            <span>⛰️ Landslide Risk</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-pmgsy">
+                            <span class="toggle-slider road"></span>
+                            <span>🛣️ PMGSY Roads</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-jjm">
+                            <span class="toggle-slider water"></span>
+                            <span>💧 Jal Jeevan Mission</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Agriculture Layer Controls -->
+                <div class="panel layer-panel">
+                    <h3>🌾 Agriculture Layers</h3>
+                    <div class="layer-toggles">
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-horticulture">
+                            <span class="toggle-slider agri-h"></span>
+                            <span>🍎 Horticulture Belts</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-cropzone">
+                            <span class="toggle-slider agri-c"></span>
+                            <span>🌾 Crop Suitability Zones</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-mandi">
+                            <span class="toggle-slider agri-m"></span>
+                            <span>🏪 Mandi / Markets</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-coldstorage">
+                            <span class="toggle-slider agri-cs"></span>
+                            <span>❄️ Cold Storage</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-organic">
+                            <span class="toggle-slider agri-o"></span>
+                            <span>🌱 Organic Farming</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-polyhouse">
+                            <span class="toggle-slider agri-p"></span>
+                            <span>🏗️ Protected Agriculture</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-fpo">
+                            <span class="toggle-slider agri-f"></span>
+                            <span>👩‍🌾 FPO / SHG Clusters</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-pmksy">
+                            <span class="toggle-slider agri-i"></span>
+                            <span>💧 PMKSY Irrigation</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-maps">
+                            <span class="toggle-slider agri-mp"></span>
+                            <span>🌿 Medicinal Plants</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Forest Layer Controls -->
+                <div class="panel layer-panel">
+                    <h3>🌲 Forest & Tree Cover</h3>
+                    <div class="layer-toggles">
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-forestcover">
+                            <span class="toggle-slider forest-fc"></span>
+                            <span>🌳 Forest Cover Zones</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-pine">
+                            <span class="toggle-slider forest-p"></span>
+                            <span>🌲 Pine (Chīr) Forests</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-treespecies">
+                            <span class="toggle-slider forest-ts"></span>
+                            <span>🌳 Tree Species Zones</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-protected">
+                            <span class="toggle-slider forest-pr"></span>
+                            <span>🏛️ Protected Areas</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-firerisk">
+                            <span class="toggle-slider forest-fr"></span>
+                            <span>🔥 Forest Fire Risk</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-vanpanchayat">
+                            <span class="toggle-slider forest-vp"></span>
+                            <span>🏠 Van Panchayat</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" id="layer-pineenergy">
+                            <span class="toggle-slider forest-pe"></span>
+                            <span>⚡🌲 Pine Needle Energy</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="panel chart-panel">
+                    <h3>📈 Generation Mix</h3>
+                    <canvas id="chart-generation" height="180"></canvas>
+                </div>
+                <div class="panel chart-panel">
+                    <h3>💼 Economic Impact</h3>
+                    <canvas id="chart-economic" height="180"></canvas>
+                </div>
+
+                <!-- Crop Calendar Panel -->
+                <div class="panel crop-calendar-panel">
+                    <h3>📅 Crop Calendar</h3>
+                    <div id="crop-calendar"></div>
+                </div>
+
+                <!-- UREDA Schemes Panel -->
+                <div class="panel scheme-panel">
+                    <h3>🏛️ UREDA Schemes</h3>
+                    <div id="scheme-cards"></div>
+                </div>
+
+                <!-- Footer -->
+                <div class="sidebar-footer">
+                    <p>Zero Budget · Maximum Impact</p>
+                    <p class="tagline">"पहाड़ के लोग, पहाड़ की बोली, पहाड़ का नक्शा"</p>
+                    <p class="credit">Built by <strong>CHANGE TechLab</strong></p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Map Container -->
+        <div id="map-container">
+            <div id="map"></div>
+            <!-- Map Legend -->
+            <div id="map-legend" class="map-legend">
+                <h4>Legend</h4>
+                <div class="legend-section" id="legend-wind">
+                    <span class="legend-title">💨 Wind (m/s)</span>
+                    <div class="legend-gradient wind-gradient"></div>
+                    <div class="legend-labels"><span>2</span><span>4</span><span>6</span><span>8+</span></div>
+                </div>
+                <div class="legend-section" id="legend-solar">
+                    <span class="legend-title">☀️ Solar (kWh/m²/day)</span>
+                    <div class="legend-gradient solar-gradient"></div>
+                    <div class="legend-labels"><span>3.5</span><span>4.5</span><span>5.0</span><span>5.5+</span></div>
+                </div>
+                <div class="legend-section" id="legend-hubs">
+                    <span class="legend-title">🔋 Hub Status</span>
+                    <div class="legend-items">
+                        <span class="legend-dot active"></span> Active/Proposed
+                        <span class="legend-dot assessment"></span> Under Assessment
+                        <span class="legend-dot risk"></span> Risk-Constrained
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chat Panel (Hidden by default) -->
+    <div id="chat-panel" class="chat-panel hidden">
+        <div class="chat-header">
+            <h3>🤖 उत्तराखंड RE सहायक</h3>
+            <button id="chat-close" class="icon-btn">✕</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg bot">
+                <div class="msg-content">नमस्ते! 🙏 मैं उत्तराखंड Renewable Energy Hub का AI सहायक हूँ। आप किसी भी जिले के wind/solar potential, microgrid sites, या UREDA schemes के बारे में पूछ सकते हैं।</div>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="अपना सवाल यहाँ लिखें..." autocomplete="off">
+            <button id="chat-send" class="icon-btn accent">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Hub Detail Modal -->
+    <div id="hub-modal" class="modal hidden">
+        <div class="modal-content">
+            <button id="modal-close" class="icon-btn modal-close-btn">✕</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/districts.js"></script>
+    <script src="js/windSolar.js"></script>
+    <script src="js/microgrid.js"></script>
+    <script src="js/economic.js"></script>
+    <script src="js/agriculture.js"></script>
+    <script src="js/forest.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

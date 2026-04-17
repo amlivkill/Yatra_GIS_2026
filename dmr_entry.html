@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>केदारनाथ DMR Master Entry | Offline-First Sync</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #06090e;
+            --bg-panel: rgba(13, 19, 31, 0.85);
+            --bg-card: rgba(22, 31, 48, 0.7);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --accent: #06b6d4;
+            --green: #10b981;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --border: rgba(59, 130, 246, 0.2);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep) url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* Glassmorphism Container */
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            background: var(--bg-panel);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        @media (min-width: 600px) {
+            .app-container {
+                height: 90vh;
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+        }
+
+        /* Header */
+        header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(13,19,31,0.95) 0%, rgba(13,19,31,0) 100%);
+        }
+        .title h1 {
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .title p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        /* Network Status Badge */
+        .network-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--green);
+            transition: all 0.3s ease;
+        }
+        .network-status.offline {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--yellow);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+        }
+        .network-status.offline .status-dot {
+            background: var(--yellow);
+            box-shadow: 0 0 8px var(--yellow);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+
+        /* Sync Banner */
+        .sync-banner {
+            display: none;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            animation: slideDown 0.3s ease-out forwards;
+        }
+        .sync-banner.active { display: block; }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .main-content::-webkit-scrollbar { display: none; } /* Chrome */
+
+        /* Form Groups */
+        .form-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+        .form-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .form-group:last-child { margin-bottom: 0; }
+        
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            background: rgba(13, 19, 31, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+            appearance: none;
+        }
+        select:focus, input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Custom Select Arrow */
+        .select-wrapper { position: relative; }
+        .select-wrapper::after {
+            content: "▼";
+            font-size: 10px;
+            color: var(--text-muted);
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        /* Action Buttons */
+        .action-container {
+            padding: 20px;
+            background: rgba(13, 19, 31, 0.95);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+        .btn-save:active { transform: translateY(0); }
+
+        .btn-view {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 0.3;
+        }
+        .btn-view:hover { background: rgba(255, 255, 255, 0.1); }
+
+        /* Tabs (View Mode) */
+        .view-mode-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-deep);
+            z-index: 100;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        .view-mode-overlay.active { transform: translateX(0); }
+
+        .view-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .back-btn {
+            background: none; border: none;
+            color: var(--accent); font-size: 14px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 4px;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            white-space: nowrap;
+        }
+        th {
+            background: rgba(255,255,255,0.02);
+            color: var(--text-muted);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(10px);
+        }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Toast Message */
+        .toast {
+            position: absolute;
+            bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 13px; font-weight: 600;
+            opacity: 0; pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+            z-index: 200;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="title">
+                <h1>DMR Master Entry</h1>
+                <p>केदारनाथ यात्रा 2026</p>
+            </div>
+            <div class="network-status" id="networkStatus">
+                <div class="status-dot"></div>
+                <span id="networkText">Online</span>
+            </div>
+        </header>
+
+        <!-- Offline Sync Banner -->
+        <div class="sync-banner" id="syncBanner" onclick="syncData()">
+            ☁️ <span id="unsyncedCount">0</span> Records Pending Sync. Tap to Sync.
+        </div>
+
+        <!-- Form Area -->
+        <div class="main-content" id="formArea">
+            
+            <div class="form-section">
+                <div class="form-section-title">📍 सेक्टर व स्थान</div>
+                <div class="form-group">
+                    <label>स्थान चुनें (Location)</label>
+                    <div class="select-wrapper">
+                        <select id="location" required>
+                            <option value="">-- Select Location --</option>
+                            <option value="1. सिरोबगड से जवाडी वाईपास">1. सिरोबगड से जवाडी वाईपास</option>
+                            <option value="2. जवाडी वाईपास रुद्रप्रयाग-तिलवाड़ा">2. जवाडी वाईपास रुद्रप्रयाग-तिलवाड़ा</option>
+                            <option value="3. तिलवाडा से अगस्त्यमुनि">3. तिलवाडा से अगस्त्यमुनि</option>
+                            <option value="4. अगस्त्यमुनि से कुण्ड">4. अगस्त्यमुनि से कुण्ड</option>
+                            <option value="5. कुण्ड से गुप्तकाशी">5. कुण्ड से गुप्तकाशी</option>
+                            <option value="6. गुप्तकाशी से फाटा">6. गुप्तकाशी से फाटा</option>
+                            <option value="7. फाटा से सोनप्रयाग">7. फाटा से सोनप्रयाग</option>
+                            <option value="8. सोनप्रयाग">8. सोनप्रयाग</option>
+                            <option value="9. गौरीकुण्ड">9. गौरीकुण्ड</option>
+                            <option value="10. भीमबली">10. भीमबली</option>
+                            <option value="11. बडी लिनचैली">11. बडी लिनचैली</option>
+                            <option value="12. केदारनाथ घौडा पडाव">12. केदारनाथ घौडा पडाव</option>
+                            <option value="13. केदारनाथ हैलीपैड">13. केदारनाथ हैलीपैड</option>
+                            <option value="14. केदारनाथ मन्दिर">14. केदारनाथ मन्दिर</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>दिनांक (Date)</label>
+                    <input type="text" id="reportDate" readonly style="color: var(--accent); font-weight: 600;">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">🏗️ बुनियादी व सफाई व्यवस्था</div>
+                <div class="form-group">
+                    <label>विद्युत/पेयजल/लाइट</label>
+                    <div class="select-wrapper">
+                        <select id="infrastructure">
+                            <option value="OK">OK (सुचारू)</option>
+                            <option value="Not OK">Not OK (बाधित)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>सफाई कार्मिक</label>
+                        <input type="number" id="cleaningStaff" placeholder="संख्या" min="0">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>शौचालय (सक्रिय)</label>
+                        <input type="number" id="toilets" placeholder="संख्या" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">🏥 चिकित्सा व सुरक्षा</div>
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>उपचारित यात्री (CMO)</label>
+                        <input type="number" id="cmoTreated" placeholder="संख्या" min="0">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>पशु चिकित्सा (CVO)</label>
+                        <input type="number" id="cvoUnits" placeholder="इकाइयां" min="0">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>पुलिस बल</label>
+                        <input type="number" id="policeForce" placeholder="तैनात बल" min="0">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>अन्य (SDRF/MTF)</label>
+                        <input type="number" id="otherForces" placeholder="तैनात बल" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">🚶 यात्री व परिवहन व्यवस्था</div>
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>यात्री प्रवाह (प्रतिदिन)</label>
+                        <input type="number" id="pilgrims" placeholder="यात्री संख्या" min="0">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>चैकिंग किए घोड़े/खच्चर</label>
+                        <input type="number" id="horses" placeholder="संख्या" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">♻️ कूड़ा निस्तारण (Kg)</div>
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>ठोस अपशिष्ट (Solid Waste)</label>
+                        <input type="number" id="solidWaste" placeholder="Kg" min="0">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>जैविक कूड़ा (Organic)</label>
+                        <input type="number" id="organicWaste" placeholder="Kg" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 20px;"></div> <!-- Bottom Padding padding -->
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-container">
+            <button class="btn btn-save" onclick="saveData()">💾 Data Save करें</button>
+            <button class="btn btn-view" onclick="toggleViewMode()">📋 View</button>
+        </div>
+
+        <!-- View Mode Overlay -->
+        <div class="view-mode-overlay" id="viewOverlay">
+            <div class="view-header">
+                <div style="font-weight: 700; color: white;">दैनिक रिपोर्ट (DMR)</div>
+                <button class="back-btn" onclick="toggleViewMode()">✕ Close</button>
+            </div>
+            
+            <div class="table-container">
+                <div id="tableContent">
+                    <!-- Table rendered here via JS -->
+                </div>
+            </div>
+            
+            <div class="action-container" style="background: transparent;">
+                <button class="btn" style="background: rgba(255,255,255,0.1); color: white;" onclick="exportCSV()">📥 Download CSV</button>
+            </div>
+        </div>
+
+        <div class="toast" id="toast">✅ Data Saved Offline !</div>
+    </div>
+
+    <!-- Application Logic (Offline First) -->
+    <script>
+        // Set Today's Date
+        document.getElementById('reportDate').value = new Date().toLocaleDateString('hi-IN');
+
+        // State variables
+        let isOnline = navigator.onLine;
+        let pendingSync = [];
+        let allRecords = JSON.parse(localStorage.getItem('dmr_data')) || [];
+
+        // Network Listener
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+
+        function updateNetworkStatus() {
+            isOnline = navigator.onLine;
+            const badge = document.getElementById('networkStatus');
+            const text = document.getElementById('networkText');
+            
+            if (isOnline) {
+                badge.classList.remove('offline');
+                text.textContent = 'Online';
+                checkPendingSync();
+            } else {
+                badge.classList.add('offline');
+                text.textContent = 'Offline Saving';
+            }
+        }
+
+        // Check if there's data to sync to cloud
+        function checkPendingSync() {
+            pendingSync = allRecords.filter(r => !r.synced);
+            const banner = document.getElementById('syncBanner');
+            if (pendingSync.length > 0 && isOnline) {
+                document.getElementById('unsyncedCount').textContent = pendingSync.length;
+                banner.classList.add('active');
+            } else {
+                banner.classList.remove('active');
+            }
+        }
+
+        // Initial check
+        updateNetworkStatus();
+
+        // Main Save Function
+        function saveData() {
+            const loc = document.getElementById('location').value;
+            if (!loc) {
+                alert('कृपया स्थान (Location) चुनें');
+                return;
+            }
+
+            const record = {
+                id: Date.now(),
+                date: document.getElementById('reportDate').value,
+                location: loc,
+                infrastructure: document.getElementById('infrastructure').value || 'OK',
+                cleaningStaff: document.getElementById('cleaningStaff').value || '0',
+                toilets: document.getElementById('toilets').value || '0',
+                cmoTreated: document.getElementById('cmoTreated').value || '-',
+                cvoUnits: document.getElementById('cvoUnits').value || '-',
+                policeForce: document.getElementById('policeForce').value || '-',
+                otherForces: document.getElementById('otherForces').value || '-',
+                pilgrims: document.getElementById('pilgrims').value || '-',
+                horses: document.getElementById('horses').value || '-',
+                solidWaste: document.getElementById('solidWaste').value || '-',
+                organicWaste: document.getElementById('organicWaste').value || '-',
+                synced: false // Default to offline until synced
+            };
+
+            // Remove existing record for this location today if any, to act as update/upsert
+            allRecords = allRecords.filter(r => !(r.location === record.location && r.date === record.date));
+            allRecords.push(record);
+            
+            // Save to LocalStorage
+            localStorage.setItem('dmr_data', JSON.stringify(allRecords));
+
+            // Reset form partly (keep location but clear numbers)
+            ['cleaningStaff','toilets','cmoTreated','cvoUnits','policeForce','otherForces','pilgrims','horses','solidWaste','organicWaste'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+
+            // Show Toast & Banner Strategy
+            showToast(isOnline ? '✅ Data Saved & Queued!' : '💾 Saved Offline Successfully!');
+            checkPendingSync();
+            
+            // Re-render table if open
+            renderTable();
+        }
+
+        // Sync Data to "Cloud" (Simulation)
+        function syncData() {
+            if (!isOnline) {
+                alert('You are offline. Please connect to internet to sync.');
+                return;
+            }
+            
+            const btn = document.getElementById('syncBanner');
+            btn.innerHTML = '🔄 Syncing to Cloud...';
+            
+            // Simulate API Call duration
+            setTimeout(() => {
+                allRecords.forEach(r => r.synced = true);
+                localStorage.setItem('dmr_data', JSON.stringify(allRecords));
+                checkPendingSync();
+                btn.innerHTML = '☁️ <span id="unsyncedCount">0</span> Records Pending Sync. Tap to Sync.';
+                showToast('🚀 All Data Synced with Master Dashboard!');
+                renderTable(); // Update status in table
+            }, 1500);
+        }
+
+        // Toggle Table View
+        function toggleViewMode() {
+            const overlay = document.getElementById('viewOverlay');
+            overlay.classList.toggle('active');
+            if (overlay.classList.contains('active')) {
+                renderTable();
+            }
+        }
+
+        // Draw Table
+        function renderTable() {
+            const container = document.getElementById('tableContent');
+            if (allRecords.length === 0) {
+                container.innerHTML = '<div class="empty-state">No Data Entered Yet.</div>';
+                return;
+            }
+
+            // Group latest records by location for today (or sort descending)
+            // Just show all for this demo, latest first
+            const sorted = [...allRecords].sort((a,b) => b.id - a.id);
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Location</th>
+                            <th>Infra</th>
+                            <th>Clean Staff</th>
+                            <th>Toilets</th>
+                            <th>CMO</th>
+                            <th>CVO</th>
+                            <th>Police</th>
+                            <th>Pilgrims</th>
+                            <th>Horses</th>
+                            <th>S-Waste</th>
+                            <th>O-Waste</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            sorted.forEach(r => {
+                html += `
+                    <tr>
+                        <td style="color: ${r.synced ? 'var(--green)' : 'var(--yellow)'}">
+                            ${r.synced ? '☁️ Synced' : '💾 Offline'}
+                        </td>
+                        <td style="font-weight:600; color:var(--accent)">${r.location}</td>
+                        <td>${r.infrastructure}</td>
+                        <td>${r.cleaningStaff}</td>
+                        <td>${r.toilets}</td>
+                        <td>${r.cmoTreated}</td>
+                        <td>${r.cvoUnits}</td>
+                        <td>${r.policeForce}</td>
+                        <td>${r.pilgrims}</td>
+                        <td>${r.horses}</td>
+                        <td>${r.solidWaste}</td>
+                        <td>${r.organicWaste}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // Export as CSV
+        function exportCSV() {
+            if (allRecords.length === 0) return;
+            
+            const headers = ['Date', 'Location', 'Infra', 'Clean Staff', 'Toilets', 'CMO Treated', 'CVO Units', 'Police', 'Other Forces', 'Pilgrims', 'Horses Checked', 'Solid Waste(Kg)', 'Organic Waste(Kg)', 'Sync Status'];
+            
+            const rows = allRecords.map(r => [
+                r.date, r.location, r.infrastructure, r.cleaningStaff, r.toilets, r.cmoTreated, r.cvoUnits, r.policeForce, r.otherForces, r.pilgrims, r.horses, r.solidWaste, r.organicWaste, r.synced ? 'Synced' : 'Offline'
+            ]);
+
+            const csvContent = [headers, ...rows]
+                .map(e => e.map(item => `"${item}"`).join(","))
+                .join("\n");
+
+            const blob = new Blob(["\uFEFF"+csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `DMR_Master_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Custom Toast UI
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+    </script>
+</body>
+</html>
