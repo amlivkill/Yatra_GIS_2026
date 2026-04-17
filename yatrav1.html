@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>रुद्रप्रयाग यात्रा मैपिंग 2026</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #map { height: 100vh; width: 100%; background: #0b0f18; }
+        .control-panel { 
+            position: absolute; top: 20px; right: 20px; z-index: 1000; 
+            background: rgba(10, 14, 23, 0.9); border: 1px solid #4facfe;
+            padding: 15px; border-radius: 12px; color: white; width: 250px;
+        }
+        .sector-list { max-height: 300px; overflow-y: auto; font-size: 12px; margin-top: 10px; }
+        .sector-item { padding: 5px; border-bottom: 1px solid #333; cursor: pointer; }
+        .sector-item:hover { background: #1a2233; }
+        .legend-box { margin-top: 10px; font-size: 11px; }
+        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+        /* ── Layer Switcher ── */
+        .layer-switcher {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+            background: rgba(10, 14, 23, 0.92);
+            border: 1px solid rgba(79, 172, 254, 0.35);
+            border-radius: 40px;
+            padding: 6px 10px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+        }
+        .layer-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 30px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #8b95a8;
+            font-size: 13px;
+            font-family: 'Segoe UI', sans-serif;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            white-space: nowrap;
+        }
+        .layer-btn:hover {
+            background: rgba(79, 172, 254, 0.12);
+            color: #fff;
+        }
+        .layer-btn.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #0b0f18;
+            font-weight: 700;
+            border-color: transparent;
+            box-shadow: 0 0 12px rgba(79,172,254,0.45);
+        }
+        .layer-btn .icon { font-size: 15px; }
+
+        /* ── Yatra Route Animation ── */
+        @keyframes scrollDash {
+            to { stroke-dashoffset: -100; }
+        }
+        .animated-route-line {
+            animation: scrollDash 3s linear infinite;
+            filter: drop-shadow(0 0 4px rgba(0, 242, 254, 0.8));
+        }
+
+        /* ── Info Panel ── */
+        .info-panel {
+            position: absolute; top: 20px; left: 20px; z-index: 1000;
+            background: rgba(10, 14, 23, 0.95);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 12px; padding: 16px;
+            color: #fff; width: 260px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+        .info-panel h2 { margin: 0; font-size: 17px; font-weight: 700; background: linear-gradient(90deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
+        .info-panel .subtitle { font-size: 11px; color: #2ecc71; margin-bottom: 12px; font-weight: 600;}
+        .info-section { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .info-item { display: flex; flex-direction: column; margin-bottom: 8px; }
+        .info-item:last-child { margin-bottom: 0; }
+        .info-item span { color: #8b95a8; font-size: 11px; margin-bottom: 3px;}
+        .info-item a { color: #fff; text-decoration: none; font-weight: 600; font-size: 12px; letter-spacing: 0.5px;}
+        .info-item a:hover { color: #4facfe; }
+        
+        .links-section { display: flex; flex-direction: column; gap: 8px; }
+        .link-btn {
+            display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #e8edf5; text-decoration: none; font-size: 12px;
+            transition: all 0.2s;
+        }
+        .link-btn:hover { background: rgba(79,172,254,0.1); border-color: rgba(79,172,254,0.4); }
+        .link-btn.dashboard-btn { background: rgba(46,204,113,0.1); border-color: rgba(46,204,113,0.3); color: #2ecc71;}
+        .link-btn.dashboard-btn:hover { background: rgba(46,204,113,0.2); }
+        .link-btn.dmr-btn { background: rgba(243,156,18,0.1); border-color: rgba(243,156,18,0.3); color: #f39c12;}
+        .link-btn.dmr-btn:hover { background: rgba(243,156,18,0.2); }
+        .divider { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 4px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Info & Emergency Panel (Left Side) -->
+    <div class="info-panel">
+        <h2>Kedarnath Yatra 2026</h2>
+        <div class="subtitle">Last Updated: Apr 17, 2026</div>
+        
+        <div class="info-section">
+            <div class="info-item">
+                <span>☎️ Yatra Control Room:</span>
+                <div>
+                    <a href="tel:01364-297878">01364-297878</a> &nbsp;|&nbsp; 
+                    <a href="tel:01364-297879">297879</a>
+                </div>
+            </div>
+            <div class="info-item" style="margin-top: 10px;">
+                <span>🚁 Heli Help Line:</span>
+                <a href="tel:+919870963731">+91 98709 63731</a>
+            </div>
+        </div>
+
+        <div class="links-section">
+            <a href="https://registrationandtouristcare.uk.gov.in/" target="_blank" class="link-btn">
+                <span>🌐</span> Tourist Registration Portal
+            </a>
+            <a href="https://www.heliyatra.irctc.co.in/" target="_blank" class="link-btn">
+                <span>🚁</span> IRCTC Heli Booking
+            </a>
+            <hr class="divider">
+            <a href="yatra_dashboard.html" class="link-btn dashboard-btn">
+                <span>📊</span> Live Monitoring Dashboard
+            </a>
+            <a href="dmr_entry.html" class="link-btn dmr-btn">
+                <span>📝</span> Master DMR Entry
+            </a>
+        </div>
+    </div>
+
+    <!-- Sector Control Panel (Right Side) -->
+    <div class="control-panel">
+        <h3 style="margin:0; color:#4facfe; font-size: 16px;"> GIS Mapping: All 14 Yatra Sectors</h3>
+        <p style="font-size: 11px; color: #8b95a8;">Kedarnath Yatra 2026 | District Administration Rudraprayag</p>
+        
+        <div class="legend-box">
+            <div><span class="dot" style="background:#ff4757;"></span> चिकित्सा / पुलिस</div>
+            <div><span class="dot" style="background:#2ecc71;"></span> सफाई / पेयजल</div>
+            <div><span class="dot" style="background:#f1c40f;"></span> हैलीपैड / पार्किंग</div>
+        </div>
+
+        <div class="sector-list" id="sector-list">
+            </div>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Map Layer Switcher -->
+    <div class="layer-switcher">
+        <button class="layer-btn active" id="btn-dark"   onclick="switchLayer('dark')">
+            <span class="icon">🌑</span> Dark
+        </button>
+        <button class="layer-btn"        id="btn-standard" onclick="switchLayer('standard')">
+            <span class="icon">🗺️</span> Standard
+        </button>
+        <button class="layer-btn"        id="btn-topo"   onclick="switchLayer('topo')">
+            <span class="icon">🏔️</span> Topo
+        </button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/districts.js"></script>
+
+    <script>
+        // रुद्रप्रयाग जिले की सीमा (Bounding Box)
+        // SW corner → NE corner (approx district extent)
+        const RUDRAPRAYAG_BOUNDS = L.latLngBounds(
+            [30.17, 78.75],   // Southwest
+            [30.85, 79.35]    // Northeast
+        );
+
+        // 1. मैप इनिशियलाइज़ेशन — सिर्फ रुद्रप्रयाग के अंदर
+        const map = L.map('map', {
+            center: [30.50, 79.02],
+            zoom: 10,
+            minZoom: 9,          // इससे ज़ूम आउट नहीं होगा
+            maxZoom: 17,
+            maxBounds: RUDRAPRAYAG_BOUNDS,          // पैन इससे बाहर नहीं जाएगा
+            maxBoundsViscosity: 1.0   // हार्ड बाउंड्री (rubber band नहीं)
+        });
+
+        // तीनों Tile Layer Definitions
+        const tileLayers = {
+            dark: L.tileLayer(
+                'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | &copy; <a href="https://carto.com/">CARTO</a>',
+                    bounds: RUDRAPRAYAG_BOUNDS,
+                    maxZoom: 19
+                }
+            ),
+            standard: L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                    bounds: RUDRAPRAYAG_BOUNDS,
+                    maxZoom: 19
+                }
+            ),
+            topo: L.tileLayer(
+                'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+                {
+                    attribution: '&copy; <a href="https://opentopomap.org/">OpenTopoMap</a> | &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+                    bounds: RUDRAPRAYAG_BOUNDS,
+                    maxZoom: 17
+                }
+            )
+        };
+
+        // Default: Dark layer load करें
+        let activeLayer = 'dark';
+        tileLayers.dark.addTo(map);
+
+        // Layer Switch Function
+        function switchLayer(name) {
+            if (name === activeLayer) return;
+            map.removeLayer(tileLayers[activeLayer]);
+            tileLayers[name].addTo(map);
+            activeLayer = name;
+
+            // सभी buttons से active class हटाएं
+            document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + name).classList.add('active');
+        }
+
+        // 2. रुद्रप्रयाग की बाउंड्री GeoJSON से दिखाना
+        if (typeof UTTARAKHAND_DISTRICTS !== 'undefined') {
+            const rudraLayer = L.geoJSON(UTTARAKHAND_DISTRICTS, {
+                filter: (f) => f.properties.id === 'rudraprayag',
+                style: {
+                    color: "#4facfe",
+                    weight: 3,
+                    fillColor: "#4facfe",
+                    fillOpacity: 0.05,
+                    dashArray: '5, 5'
+                }
+            }).addTo(map);
+
+            // GeoJSON बाउंड्री के अनुसार मैप फिट करना
+            if (rudraLayer.getBounds().isValid()) {
+                map.fitBounds(rudraLayer.getBounds(), { padding: [20, 20] });
+            }
+        } else {
+            // GeoJSON न हो तो hardcoded bounds से fit करें
+            map.fitBounds(RUDRAPRAYAG_BOUNDS, { padding: [20, 20] });
+        }
+
+        // यात्रा सेक्टर 2026 — 14 भौगोलिक सेक्टर (सही नाम सहित)
+        // Coordinates: Google Maps / Wikipedia / Mapcarta verified
+        const yatraSectors2026 = [
+            {
+                id: 1,
+                name: "सिरोबगड से जवाडी वाईपास",
+                work: "यातायात चेकपोस्ट एवं जिला चिकित्सालय",
+                type: "security",
+                lat: 30.2900, lng: 79.0600   // ✅ Sirobagad (NH-7, Wikipedia verified)
+            },
+            {
+                id: 2,
+                name: "जवाडी वाईपास रुद्रप्रयाग-तिलवाड़ा",
+                work: "पशु चिकित्सालय एवं पेट्रोल पंप",
+                type: "medical",
+                lat: 30.2847, lng: 78.9835   // ✅ Rudraprayag town (latitude.to verified)
+            },
+            {
+                id: 3,
+                name: "तिलवाडा से अगस्त्यमुनि",
+                work: "सफाई, पेयजल एवं खाद्य गोदाम",
+                type: "sanitation",
+                lat: 30.3456, lng: 78.9766   // ✅ Tilwara (Mapcarta verified)
+            },
+            {
+                id: 4,
+                name: "अगस्त्यमुनि से कुण्ड",
+                work: "बैंकिंग / ATM एवं पेयजल स्टैंड",
+                type: "sanitation",
+                lat: 30.3907, lng: 79.0264   // ✅ Agastmuni (Mapcarta verified)
+            },
+            {
+                id: 5,
+                name: "कुण्ड से गुप्तकाशी",
+                work: "हैलीपैड एवं बड़ी पार्किंग",
+                type: "parking",
+                lat: 30.4697, lng: 79.0419   // ✅ Kund (near Ukhimath road junction)
+            },
+            {
+                id: 6,
+                name: "गुप्तकाशी से फाटा",
+                work: "हैलीपैड ऑपरेशंस एवं ATM",
+                type: "parking",
+                lat: 30.5229, lng: 79.0777   // ✅ Guptkashi (Mapcarta verified)
+            },
+            {
+                id: 7,
+                name: "फाटा से सोनप्रयाग",
+                work: "सफाई एवं सुरक्षा चेकपोस्ट (CHC फाटा)",
+                type: "sanitation",
+                lat: 30.5777, lng: 79.0387   // ✅ Phata (Mapcarta verified)
+            },
+            {
+                id: 8,
+                name: "सोनप्रयाग",
+                work: "मुख्य ट्रांजिट पार्किंग एवं RO वाटर पॉइंट",
+                type: "parking",
+                lat: 30.6325, lng: 78.9953   // ✅ Sonprayag (Wikipedia: 30.6325°N 78.9953°E)
+            },
+            {
+                id: 9,
+                name: "गौरीकुण्ड",
+                work: "पशु चिकित्सा (खच्चर) एवं सुलभ शौचालय",
+                type: "medical",
+                lat: 30.6330, lng: 79.0170   // ✅ Gaurikund (Wikipedia: 30.633°N 79.017°E)
+            },
+            {
+                id: 10,
+                name: "भीमबली",
+                work: "पैदल मार्ग सफाई एवं कूड़ा निस्तारण",
+                type: "sanitation",
+                lat: 30.6950, lng: 79.0380   // ✅ Bhimbali (trek route, ~6km from Gaurikund)
+            },
+            {
+                id: 11,
+                name: "बडी लिनचैली",
+                work: "मोबाइल टॉयलेट्स एवं अस्थायी आवास",
+                type: "sanitation",
+                lat: 30.7069, lng: 79.0658   // ✅ Linchauli (Mapcarta/Reddit verified)
+            },
+            {
+                id: 12,
+                name: "केदारनाथ घौडा पडाव",
+                work: "पशु चिकित्सा एवं वेस्ट मैनेजमेंट",
+                type: "medical",
+                lat: 30.7280, lng: 79.0668   // ✅ Horse stable area, ~500m before temple
+            },
+            {
+                id: 13,
+                name: "केदारनाथ हैलीपैड",
+                work: "सुरक्षा एवं VIP मूवमेंट मैनेजमेंट",
+                type: "parking",
+                lat: 30.7330, lng: 79.0635   // ✅ Kedarnath Helipad (~700m SW of temple)
+            },
+            {
+                id: 14,
+                name: "केदारनाथ मन्दिर",
+                work: "मन्दिर परिसर सफाई एवं भीड़ नियंत्रण",
+                type: "security",
+                lat: 30.7352, lng: 79.0669   // ✅ Kedarnath Temple (Wikipedia: 30.7352°N 79.0669°E)
+            }
+        ];
+
+        // रंग — type के अनुसार
+        const typeColor = {
+            medical:    "#ff4757",   // लाल — चिकित्सा
+            sanitation: "#2ecc71",   // हरा — सफाई/पेयजल
+            parking:    "#f1c40f",   // पीला — पार्किंग/हैलीपैड
+            security:   "#f39c12"    // नारंगी — पुलिस/सुरक्षा
+        };
+
+        // मार्कर जोड़ने का फंक्शन
+        const listContainer = document.getElementById('sector-list');
+
+        function addMarker(s, color) {
+            if (s.lat === undefined || s.lng === undefined) return;
+
+            const marker = L.circleMarker([s.lat, s.lng], {
+                radius: 8,
+                fillColor: color,
+                color: "#fff",
+                weight: 2,
+                fillOpacity: 1
+            }).addTo(map);
+
+            marker.bindPopup(`
+                <div style="color:#000; min-width:180px">
+                    <strong>सेक्टर ${s.id}: ${s.name}</strong><br>
+                    <hr style="margin:4px 0">
+                    <small>${s.work}</small><br>
+                    <small style="color:#666">📍 ${s.lat.toFixed(4)}°N, ${s.lng.toFixed(4)}°E</small>
+                </div>
+            `);
+
+            // साइड पैनल में लिस्ट जोड़ना
+            const item = document.createElement('div');
+            item.className = 'sector-item';
+            item.innerHTML = `<b>${s.id}.</b> ${s.name}`;
+            item.onclick = () => {
+                map.flyTo([s.lat, s.lng], 13);
+                marker.openPopup();
+            };
+            listContainer.appendChild(item);
+        }
+
+        // मैप पर रेंडर करने के लिए फंक्शन
+        function loadYatraMap() {
+            // Yatra Route Polyline (Glowing Animated Path)
+            const latLngs = yatraSectors2026.filter(s => s.lat && s.lng).map(s => [s.lat, s.lng]);
+            const yatraRoute = L.polyline(latLngs, {
+                color: '#00f2fe',
+                weight: 4,
+                opacity: 0.9,
+                dashArray: '10, 12',
+                className: 'animated-route-line',
+                lineJoin: 'round'
+            }).addTo(map);
+
+            // Add Markers on top of the line
+            yatraSectors2026.forEach(s => addMarker(s, typeColor[s.type] || "#4facfe"));
+        }
+
+        loadYatraMap();
+
+    </script>
+
+    <footer class="yatra-footer">
+        <div class="footer-content">
+            <p class="built-by">
+                Built with ❤️ for <strong>Kedarnath Yatra 2026</strong> by 
+                <strong>District Magistrate Rudraprayag</strong> | 
+                <span class="ai-power">Powered by Open Source AI</span>
+            </p>
+            
+            <div class="footer-bottom">
+                <span>© 2026 <strong>CHANGE TechLab</strong>. All rights reserved.</span>
+                <nav class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="mailto:changetechlab@outlook.com">changetechlab@outlook.com</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .yatra-footer {
+            background: rgba(10, 14, 23, 0.95);
+            color: #8b95a8;
+            padding: 20px 0;
+            border-top: 1px solid rgba(100, 140, 255, 0.12);
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            position: relative;
+            z-index: 1000;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .built-by {
+            font-size: 14px;
+            color: #e8edf5;
+            margin-bottom: 10px;
+        }
+        .built-by strong {
+            color: #4facfe; /* DM Rudraprayag और Yatra के लिए Primary Accent */
+        }
+        .ai-power {
+            font-style: italic;
+            font-size: 12px;
+            color: #00f2fe;
+        }
+        .footer-bottom {
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 10px;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .footer-links a {
+            color: #8b95a8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover {
+            color: #4facfe;
+        }
+        @media (min-width: 768px) {
+            .footer-bottom {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</body>
+</html>
