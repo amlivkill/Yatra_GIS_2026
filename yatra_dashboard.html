@@ -33,7 +33,7 @@
             height: 100vh;
             overflow: hidden;
             display: grid;
-            grid-template-rows: 56px 1fr;
+            grid-template-rows: 56px 1fr auto;
             grid-template-columns: 380px 1fr;
         }
 
@@ -182,6 +182,168 @@
         }
         .export-btn:hover { background: rgba(79,172,254,0.08); }
 
+        /* ─── DARSHAN TAB ─── */
+        .darshan-date-selector {
+            display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
+        }
+        .date-chip {
+            padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+            background: var(--bg-card); color: var(--muted); font-size: 11px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .date-chip:hover { border-color: var(--accent); color: #fff; }
+        .date-chip.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #080c14; border-color: transparent;
+            box-shadow: 0 0 10px rgba(79,172,254,0.3);
+        }
+        .darshan-hero {
+            background: linear-gradient(135deg, rgba(79,172,254,0.12), rgba(0,242,254,0.08));
+            border: 1px solid rgba(79,172,254,0.25);
+            border-radius: 14px; padding: 18px; text-align: center; margin-bottom: 14px;
+        }
+        .darshan-hero .hero-date { font-size: 11px; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+        .darshan-hero .hero-daily {
+            font-size: 36px; font-weight: 800;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .darshan-hero .hero-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        .darshan-hero .hero-total {
+            margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 13px; font-weight: 600; color: var(--green);
+        }
+        .darshan-breakdown {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 14px;
+        }
+        .darshan-item {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 10px 8px; text-align: center;
+        }
+        .darshan-item .d-icon { font-size: 18px; margin-bottom: 4px; }
+        .darshan-item .d-val { font-size: 18px; font-weight: 700; }
+        .darshan-item .d-lbl { font-size: 9px; color: var(--muted); margin-top: 2px; }
+        .darshan-item.male .d-val { color: #60a5fa; }
+        .darshan-item.female .d-val { color: #f472b6; }
+        .darshan-item.child .d-val { color: #34d399; }
+        .darshan-foreign {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 10px 14px; margin-bottom: 14px;
+            font-size: 11px; color: var(--muted); display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .darshan-note {
+            background: rgba(243,156,18,0.08); border: 1px solid rgba(243,156,18,0.2);
+            border-radius: 10px; padding: 10px 12px; font-size: 10px;
+            color: #f59e0b; margin-bottom: 14px; line-height: 1.5;
+        }
+        .darshan-chart-container {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px; margin-bottom: 14px;
+        }
+        .darshan-chart-container h4 {
+            font-size: 12px; color: var(--accent); margin-bottom: 10px; font-weight: 600;
+        }
+        .mini-bar-row {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px;
+        }
+        .mini-bar-label { width: 80px; text-align: right; color: var(--muted); font-weight: 500; white-space: nowrap; }
+        .mini-bar-track { flex: 1; background: rgba(255,255,255,0.06); border-radius: 4px; height: 14px; overflow: hidden; position: relative; }
+        .mini-bar-fill {
+            height: 100%; border-radius: 4px; transition: width 0.5s ease;
+            display: flex; align-items: center; justify-content: flex-end; padding-right: 6px;
+            font-size: 9px; font-weight: 700; color: #080c14;
+        }
+        .weather-alert {
+            background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 10px; padding: 12px; margin-bottom: 14px;
+        }
+        .weather-alert .wa-title {
+            font-size: 12px; font-weight: 700; color: var(--red); margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .weather-alert .wa-body { font-size: 11px; color: var(--muted); line-height: 1.6; }
+        .weather-alert .wa-body strong { color: var(--text); }
+        .darshan-source {
+            text-align: center; font-size: 10px; color: var(--muted); padding: 8px 0;
+        }
+
+        /* ─── INFO / SUCHNA TAB ─── */
+        .info-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px; margin-bottom: 14px;
+            position: relative; overflow: hidden;
+        }
+        .info-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 3px; border-radius: 12px 12px 0 0;
+        }
+        .info-card.heli::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .info-card.doli::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .info-card.helpline::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+        .info-card-title {
+            font-size: 13px; font-weight: 700; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .info-card-title .badge {
+            font-size: 9px; padding: 2px 8px; border-radius: 10px;
+            font-weight: 600;
+        }
+        .heli .info-card-title { color: #f97316; }
+        .heli .badge { background: rgba(249,115,22,0.12); color: #f97316; }
+        .doli .info-card-title { color: #a78bfa; }
+        .doli .badge { background: rgba(167,139,250,0.12); color: #a78bfa; }
+        .helpline .info-card-title { color: var(--accent); }
+        .helpline .badge { background: rgba(79,172,254,0.12); color: var(--accent); }
+
+        .rate-table {
+            width: 100%; border-collapse: collapse; font-size: 11px;
+        }
+        .rate-table th {
+            text-align: left; padding: 7px 8px; font-size: 10px;
+            color: var(--muted); font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.02);
+        }
+        .rate-table td {
+            padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.04);
+            vertical-align: middle;
+        }
+        .rate-table tr:last-child td { border-bottom: none; }
+        .rate-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .rate-val {
+            font-weight: 700; font-variant-numeric: tabular-nums;
+        }
+        .rate-val.price { color: var(--green); }
+        .info-link {
+            display: inline-flex; align-items: center; gap: 5px;
+            color: var(--accent); text-decoration: none; font-weight: 600;
+            font-size: 11px; padding: 5px 10px; border-radius: 6px;
+            background: rgba(79,172,254,0.08); transition: all 0.2s;
+            margin-top: 8px;
+        }
+        .info-link:hover { background: rgba(79,172,254,0.15); }
+        .helpline-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .helpline-row:last-child { border-bottom: none; }
+        .helpline-label { font-size: 11px; color: var(--muted); }
+        .helpline-number {
+            font-size: 12px; font-weight: 700;
+            color: var(--text); text-decoration: none;
+        }
+        .helpline-number:hover { color: var(--accent); }
+        .info-photo-credit {
+            font-size: 9px; color: var(--muted); margin-top: 8px;
+            font-style: italic; opacity: 0.7;
+        }
+        .info-note {
+            font-size: 10px; color: var(--muted); padding: 8px 10px;
+            background: rgba(255,255,255,0.02); border-radius: 6px;
+            margin-top: 8px; line-height: 1.5;
+        }
+
         /* ─── MAP ─── */
         #map { width: 100%; height: 100%; }
 
@@ -232,6 +394,10 @@
         </div>
     </div>
     <div class="stat-pills">
+        <div class="stat-pill" style="border-color:rgba(0,242,254,0.3)">
+            <span>🛕 सम्पूर्ण योग</span>
+            <span class="val" id="h-darshan-total" style="color:var(--accent2)">6,65,140</span>
+        </div>
         <div class="stat-pill">
             <span>कुल रिपोर्ट</span>
             <span class="val" id="h-total" style="color:var(--accent)">0</span>
@@ -254,8 +420,10 @@
 <!-- ─── LEFT PANEL ─── -->
 <div class="left-panel">
     <div class="panel-tabs">
-        <button class="tab-btn active" onclick="switchTab('input')">📝 फील्ड इनपुट</button>
+        <button class="tab-btn active" onclick="switchTab('input')">📝 इनपुट</button>
         <button class="tab-btn" onclick="switchTab('reports')">📋 रिपोर्ट्स</button>
+        <button class="tab-btn" onclick="switchTab('darshan')">🛕 दर्शनार्थी</button>
+        <button class="tab-btn" onclick="switchTab('info')">ℹ️ सूचना</button>
         <button class="tab-btn" onclick="switchTab('stats')">📊 Stats</button>
     </div>
 
@@ -347,6 +515,155 @@
             <p style="color:var(--muted);font-size:12px;text-align:center;margin-top:30px">
                 अभी कोई रिपोर्ट नहीं। फील्ड इनपुट टैब से submit करें।
             </p>
+        </div>
+    </div>
+
+    <!-- DARSHAN TAB -->
+    <div class="tab-content" id="tab-darshan">
+        <div class="darshan-date-selector" id="darshan-dates"></div>
+        <div id="darshan-content"></div>
+        <div class="darshan-source">📡 स्रोत: यात्रा कंट्रोल रूम रुद्रप्रयाग</div>
+    </div>
+
+    <!-- INFO / SUCHNA TAB -->
+    <div class="tab-content" id="tab-info">
+
+        <!-- Helicopter Service Rates -->
+        <div class="info-card heli">
+            <div class="info-card-title">
+                🚁 हेलीकॉप्टर सेवा सामान्य सूचना 2026
+                <span class="badge">IRCTC</span>
+            </div>
+            <table class="rate-table">
+                <thead>
+                    <tr>
+                        <th>रूट (Route)</th>
+                        <th style="text-align:right">दोनों तरफ का किराया</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>🏔️ गुप्तकाशी → श्री केदारनाथ</td>
+                        <td style="text-align:right"><span class="rate-val price">₹12,762</span></td>
+                    </tr>
+                    <tr>
+                        <td>🏔️ फाटा → श्री केदारनाथ</td>
+                        <td style="text-align:right"><span class="rate-val price">₹10,164</span></td>
+                    </tr>
+                    <tr>
+                        <td>🏔️ सेरसी → श्री केदारनाथ</td>
+                        <td style="text-align:right"><span class="rate-val price">₹6,390</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="https://heliyatra.irctc.co.in" target="_blank" class="info-link">
+                🌐 Heli Booking Portal — heliyatra.irctc.co.in
+            </a>
+            <div class="info-photo-credit">📸 Source: Signboard at Rudraprayag-Gaurikund Road (21 Apr 2026)</div>
+        </div>
+
+        <!-- Kandi / Doli / Pony Rates -->
+        <div class="info-card doli">
+            <div class="info-card-title">
+                🐴 कंडी / डोली / पिट्ठू अनुमोदित दरें 2026
+                <span class="badge">जिला पंचायत</span>
+            </div>
+            <div class="info-note" style="margin-top:0; margin-bottom:10px">
+                गौरीकुण्ड से केदारनाथ पैदल मार्ग — जिला पंचायत रुद्रप्रयाग द्वारा निर्धारित दरें
+            </div>
+            <table class="rate-table">
+                <thead>
+                    <tr>
+                        <th>मार्ग</th>
+                        <th>दूरी</th>
+                        <th style="text-align:right">कंडी</th>
+                        <th style="text-align:right">पिट्ठू</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>गौरीकुण्ड → केदारनाथ</td>
+                        <td>22 km</td>
+                        <td style="text-align:right"><span class="rate-val price">₹8,000</span></td>
+                        <td style="text-align:right"><span class="rate-val price">₹2,500</span></td>
+                    </tr>
+                    <tr>
+                        <td>गौरीकुण्ड → रामबाड़ा</td>
+                        <td>12 km</td>
+                        <td style="text-align:right"><span class="rate-val price">₹4,500</span></td>
+                        <td style="text-align:right"><span class="rate-val price">₹1,400</span></td>
+                    </tr>
+                    <tr>
+                        <td>रामबाड़ा → केदारनाथ</td>
+                        <td>10 km</td>
+                        <td style="text-align:right"><span class="rate-val price">₹4,500</span></td>
+                        <td style="text-align:right"><span class="rate-val price">₹1,200</span></td>
+                    </tr>
+                    <tr>
+                        <td>भीमबली → केदारनाथ</td>
+                        <td>8 km</td>
+                        <td style="text-align:right"><span class="rate-val price">₹3,200</span></td>
+                        <td style="text-align:right"><span class="rate-val price">₹900</span></td>
+                    </tr>
+                    <tr>
+                        <td>लिनचौली → केदारनाथ</td>
+                        <td>5 km</td>
+                        <td style="text-align:right"><span class="rate-val price">₹2,000</span></td>
+                        <td style="text-align:right"><span class="rate-val price">₹600</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="info-note">
+                ⚠️ नोट: कंडी/डोली सेवा में गहन/गर्भवती महिलाओं, अशक्तों एवं वरिष्ठ नागरिकों को प्राथमिकता दी जाती है।
+                रात्रि यात्रा सायं 6:00 बजे के पश्चात् वर्जित है।<br>
+                कंडी सेवा का पंजीकरण गौरीकुण्ड काउंटर से अनिवार्य है।
+            </div>
+            <div class="info-photo-credit">📸 Source: Rate Board, Rudraprayag-Gaurikund Road, Ukhimath (21 Apr 2026)</div>
+        </div>
+
+        <!-- Important Helplines -->
+        <div class="info-card helpline">
+            <div class="info-card-title">
+                📞 महत्वपूर्ण हेल्पलाइन नंबर
+                <span class="badge">Emergency</span>
+            </div>
+            <div class="helpline-row">
+                <span class="helpline-label">🆘 Control Room / Help Line (Toll Free)</span>
+                <a href="tel:1077" class="helpline-number">1077</a>
+            </div>
+            <div class="helpline-row">
+                <span class="helpline-label">☎️ यात्रा कंट्रोल रूम</span>
+                <a href="tel:01364233127" class="helpline-number">01364-233127</a>
+            </div>
+            <div class="helpline-row">
+                <span class="helpline-label">☎️ कंट्रोल रूम II</span>
+                <a href="tel:01364297878" class="helpline-number">01364-297878</a>
+            </div>
+            <div class="helpline-row">
+                <span class="helpline-label">📱 Mobile (Control Room)</span>
+                <a href="tel:8944847199" class="helpline-number">89448 47199</a>
+            </div>
+            <div class="helpline-row">
+                <span class="helpline-label">👮 Police Control Room</span>
+                <a href="tel:7579257571" class="helpline-number">7579257571</a>
+            </div>
+            <div class="helpline-row">
+                <span class="helpline-label">🚨 Emergency (Police)</span>
+                <a href="tel:112" class="helpline-number">112</a>
+            </div>
+            <div class="helpline-row">
+                <span class="helpline-label">🚁 Heli Help Line</span>
+                <a href="tel:+919870963731" class="helpline-number">98709 63731</a>
+            </div>
+            <div class="helpline-row">
+                <span class="helpline-label">🏥 Ambulance</span>
+                <a href="tel:108" class="helpline-number">108</a>
+            </div>
+        </div>
+
+        <div style="text-align:center; font-size:10px; color:var(--muted); padding: 10px 0;">
+            🏛️ जिला प्रशासन रुद्रप्रयाग (उत्तराखण्ड सरकार)<br>
+            "हमारा लक्ष्य स्वस्थ एवं सुरक्षित यात्रा"
         </div>
     </div>
 
@@ -473,13 +790,15 @@ setInterval(updateClock, 1000); updateClock();
 
 // ── TABS ─────────────────────────────────────────────────────
 function switchTab(name) {
+    const tabNames = ['input','reports','darshan','info','stats'];
     document.querySelectorAll('.tab-btn').forEach((b,i) => {
-        b.classList.toggle('active', ['input','reports','stats'][i] === name);
+        b.classList.toggle('active', tabNames[i] === name);
     });
     document.querySelectorAll('.tab-content').forEach((c,i) => {
-        c.classList.toggle('active', ['tab-input','tab-reports','tab-stats'][i] === 'tab-' + name);
+        c.classList.toggle('active', ['tab-input','tab-reports','tab-darshan','tab-info','tab-stats'][i] === 'tab-' + name);
     });
     if (name === 'stats') renderStats();
+    if (name === 'darshan') renderDarshanTab();
 }
 
 // ── SEVERITY ─────────────────────────────────────────────────
@@ -666,10 +985,288 @@ function showToast() {
     setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// ── DARSHAN DATA ─────────────────────────────────────────────
+const DARSHAN_DATA = [
+    {
+        date: '04.05.2026',
+        dateLabel: '04 मई 2026',
+        note: 'दिनांक 03 मई 2026 की सायं 5 बजे से दिनांक 04 मई 2026 की सायं 5 बजे तक की संख्या',
+        male: 12346,
+        female: 7033,
+        children: 68,
+        foreignMale: 0,
+        foreignFemale: 0,
+        foreignChildren: 0,
+        dailyTotal: 19447,
+        cumulativeTotal: 327532
+    },
+    {
+        date: '05.05.2026',
+        dateLabel: '05 मई 2026',
+        note: 'दिनांक 04 मई 2026 की सायं 5 बजे से दिनांक 05 मई 2026 की सायं 5 बजे तक की संख्या',
+        male: 10800,
+        female: 6493,
+        children: 64,
+        foreignMale: 0,
+        foreignFemale: 0,
+        foreignChildren: 0,
+        dailyTotal: 17357,
+        cumulativeTotal: 344889
+    },
+    {
+        date: '18.05.2026',
+        dateLabel: '18 मई 2026',
+        note: 'दिनांक 17 मई 2026 की सायं 5 बजे से दिनांक 18 मई 2026 की सायं 5 बजे तक की संख्या',
+        male: 18667,
+        female: 11363,
+        children: 88,
+        foreignMale: 0,
+        foreignFemale: 0,
+        foreignChildren: 0,
+        dailyTotal: 30118,
+        cumulativeTotal: 665140
+    }
+];
+
+let selectedDarshanIdx = DARSHAN_DATA.length - 1; // latest by default
+
+function renderDarshanTab() {
+    // Render date chips
+    const datesEl = document.getElementById('darshan-dates');
+    datesEl.innerHTML = DARSHAN_DATA.map((d, i) => `
+        <button class="date-chip ${i === selectedDarshanIdx ? 'active' : ''}" onclick="selectDarshanDate(${i})">
+            📅 ${d.dateLabel}
+        </button>
+    `).join('');
+
+    const d = DARSHAN_DATA[selectedDarshanIdx];
+    const foreignTotal = d.foreignMale + d.foreignFemale + d.foreignChildren;
+    const maxVal = Math.max(d.male, d.female, d.children || 1);
+
+    const contentEl = document.getElementById('darshan-content');
+    contentEl.innerHTML = `
+        <!-- Hero Card -->
+        <div class="darshan-hero">
+            <div class="hero-date">🛕 केदारनाथ धाम दर्शनार्थी | ${d.dateLabel}</div>
+            <div class="hero-daily">${d.dailyTotal.toLocaleString('en-IN')}</div>
+            <div class="hero-label">दैनिक योग (Daily Total)</div>
+            <div class="hero-total">📊 सम्पूर्ण योग: ${d.cumulativeTotal.toLocaleString('en-IN')}</div>
+        </div>
+
+        <!-- Breakdown Cards -->
+        <div class="darshan-breakdown">
+            <div class="darshan-item male">
+                <div class="d-icon">👨</div>
+                <div class="d-val">${d.male.toLocaleString('en-IN')}</div>
+                <div class="d-lbl">पुरुष</div>
+            </div>
+            <div class="darshan-item female">
+                <div class="d-icon">👩</div>
+                <div class="d-val">${d.female.toLocaleString('en-IN')}</div>
+                <div class="d-lbl">महिला</div>
+            </div>
+            <div class="darshan-item child">
+                <div class="d-icon">👶</div>
+                <div class="d-val">${d.children}</div>
+                <div class="d-lbl">बच्चे</div>
+            </div>
+        </div>
+
+        <!-- Foreign visitors -->
+        <div class="darshan-foreign">
+            <span>🌍 विदेशी दर्शनार्थी (पुरुष / महिला / बच्चे)</span>
+            <span style="font-weight:700; color:${foreignTotal > 0 ? 'var(--accent)' : 'var(--muted)'}">
+                ${foreignTotal > 0 ? foreignTotal : 'NIL'}
+            </span>
+        </div>
+
+        <!-- Visual Bar Chart -->
+        <div class="darshan-chart-container">
+            <h4>📊 श्रेणी-वार विश्लेषण</h4>
+            <div class="mini-bar-row">
+                <div class="mini-bar-label">पुरुष</div>
+                <div class="mini-bar-track">
+                    <div class="mini-bar-fill" style="width:${(d.male/maxVal*100).toFixed(1)}%; background:linear-gradient(90deg,#3b82f6,#60a5fa)">
+                        ${d.male.toLocaleString('en-IN')}
+                    </div>
+                </div>
+            </div>
+            <div class="mini-bar-row">
+                <div class="mini-bar-label">महिला</div>
+                <div class="mini-bar-track">
+                    <div class="mini-bar-fill" style="width:${(d.female/maxVal*100).toFixed(1)}%; background:linear-gradient(90deg,#ec4899,#f472b6)">
+                        ${d.female.toLocaleString('en-IN')}
+                    </div>
+                </div>
+            </div>
+            <div class="mini-bar-row">
+                <div class="mini-bar-label">बच्चे</div>
+                <div class="mini-bar-track">
+                    <div class="mini-bar-fill" style="width:${(d.children/maxVal*100).toFixed(1)}%; background:linear-gradient(90deg,#10b981,#34d399)">
+                        ${d.children}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        ${DARSHAN_DATA.length > 1 ? `
+        <!-- Trend Comparison -->
+        <div class="darshan-chart-container">
+            <h4>📈 दैनिक योग ट्रेंड</h4>
+            ${DARSHAN_DATA.map((dd, i) => {
+                const maxDaily = Math.max(...DARSHAN_DATA.map(x => x.dailyTotal));
+                const pct = (dd.dailyTotal / maxDaily * 100).toFixed(1);
+                const isSelected = i === selectedDarshanIdx;
+                return `
+                <div class="mini-bar-row">
+                    <div class="mini-bar-label" style="${isSelected ? 'color:var(--accent);font-weight:700' : ''}">${dd.date}</div>
+                    <div class="mini-bar-track">
+                        <div class="mini-bar-fill" style="width:${pct}%; background:${isSelected ? 'linear-gradient(90deg,var(--accent),var(--accent2))' : 'rgba(255,255,255,0.15)'}; color:${isSelected ? '#080c14' : 'var(--muted)'}">
+                            ${dd.dailyTotal.toLocaleString('en-IN')}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+        ` : ''}
+
+        <!-- DDMA-DEOC Weather & Situation Report -->
+        <div class="weather-alert" style="background:rgba(16,185,129,0.06); border-color:rgba(16,185,129,0.25);">
+            <div class="wa-title" style="color:#10b981;">
+                🌤️ DDMA-DEOC रुद्रप्रयाग — स्थिति रिपोर्ट
+                <span style="font-size:9px;font-weight:500;color:var(--muted);margin-left:4px;">18 मई 2026 | 07:40 AM</span>
+            </div>
+            <div class="wa-body" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:8px;">
+                <div>🌡️ <strong>तापमान (न्यून)</strong><br><span style="color:var(--accent);font-weight:700">22°C</span></div>
+                <div>🌡️ <strong>तापमान (अधि.)</strong><br><span style="color:#f97316;font-weight:700">37°C</span></div>
+                <div>☀️ <strong>मौसम</strong><br><span style="color:#10b981;font-weight:700">Clear (साफ)</span></div>
+                <div>🌧️ <strong>वर्षा</strong><br><span style="color:#10b981;font-weight:700">NIL</span></div>
+            </div>
+            <div class="wa-body" style="font-size:10.5px;line-height:1.8;border-top:1px solid rgba(255,255,255,0.06);padding-top:7px;">
+                <strong>तहसील-वार वर्षा:</strong><br>
+                &nbsp;① रुद्रप्रयाग — <span style="color:#10b981">NIL</span> &nbsp;
+                ② ऊखीमठ — <span style="color:#10b981">NIL</span> &nbsp;
+                ③ जखोली — <span style="color:#10b981">NIL</span><br>
+                ⚡ <strong>विद्युत प्रभावित क्षेत्र:</strong> <span style="color:#10b981">NIL</span><br>
+                💧 <strong>पेयजल प्रभावित क्षेत्र:</strong> <span style="color:#10b981">NIL</span>
+            </div>
+        </div>
+
+        <!-- Disaster Control Room Contacts -->
+        <div style="background:rgba(79,172,254,0.06);border:1px solid rgba(79,172,254,0.2);border-radius:10px;padding:10px 12px;margin-bottom:14px;">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:7px;display:flex;align-items:center;gap:6px;">
+                🆘 जिला आपदा कंट्रोल रूम, रुद्रप्रयाग
+            </div>
+            <div style="font-size:10.5px;color:var(--muted);line-height:2;">
+                किसी भी दैवीय आपदा / घटना / दुर्घटना / मार्ग अवरुद्ध की सूचना तत्काल दें:
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:5px;">
+                <a href="tel:01364233727" style="display:flex;justify-content:space-between;align-items:center;text-decoration:none;padding:5px 8px;background:rgba(255,255,255,0.03);border-radius:6px;">
+                    <span style="font-size:10.5px;color:var(--muted)">☎️ Landline</span>
+                    <span style="font-size:12px;font-weight:700;color:var(--text)">01364-233727</span>
+                </a>
+                <a href="tel:8958757335" style="display:flex;justify-content:space-between;align-items:center;text-decoration:none;padding:5px 8px;background:rgba(255,255,255,0.03);border-radius:6px;">
+                    <span style="font-size:10.5px;color:var(--muted)">📱 Mobile I</span>
+                    <span style="font-size:12px;font-weight:700;color:var(--text)">89587 57335</span>
+                </a>
+                <a href="tel:8218326386" style="display:flex;justify-content:space-between;align-items:center;text-decoration:none;padding:5px 8px;background:rgba(255,255,255,0.03);border-radius:6px;">
+                    <span style="font-size:10.5px;color:var(--muted)">📱 Mobile II</span>
+                    <span style="font-size:12px;font-weight:700;color:var(--text)">82183 26386</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Note -->
+        <div class="darshan-note">
+            📝 नोट: ${d.note}
+        </div>
+    `;
+}
+
+function selectDarshanDate(idx) {
+    selectedDarshanIdx = idx;
+    renderDarshanTab();
+}
+
 // ── INIT: Load saved reports ──────────────────────────────────
 reports.forEach(r => addReportMarker(r));
 renderReportsList();
 updateHeaderStats();
 </script>
+
+<style>
+    .yatra-footer {
+        grid-column: 1 / -1;
+        background: var(--bg-panel);
+        color: var(--muted);
+        padding: 5px 20px;
+        border-top: 1px solid var(--border);
+        font-family: 'Inter', sans-serif;
+        position: relative;
+        z-index: 2000;
+    }
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+    }
+    .built-by {
+        margin: 0;
+        color: var(--text);
+        font-size: 11px;
+    }
+    .built-by strong {
+        color: var(--accent);
+    }
+    .ai-power {
+        font-style: italic;
+        color: var(--accent2);
+        margin-left: 4px;
+    }
+    .footer-bottom {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .footer-links {
+        display: flex;
+        gap: 12px;
+    }
+    .footer-links a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .footer-links a:hover {
+        color: var(--accent);
+    }
+    @media (max-width: 768px) {
+        .footer-content {
+            flex-direction: column;
+            gap: 5px;
+        }
+    }
+</style>
+<footer class="yatra-footer">
+    <div class="footer-content">
+        <p class="built-by">
+            Built with ❤️ for <strong>Kedarnath Yatra 2026</strong> by 
+            <strong>District Magistrate Rudraprayag</strong> | 
+            <span class="ai-power">Powered by Open Source AI</span>
+        </p>
+        
+        <div class="footer-bottom">
+            <span>© 2026 <strong>CHANGE TechLab</strong>. All rights reserved.</span>
+            <nav class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="mailto:changetechlab@outlook.com">changetechlab@outlook.com</a>
+            </nav>
+        </div>
+    </div>
+</footer>
 </body>
 </html>

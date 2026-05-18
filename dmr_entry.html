@@ -707,5 +707,71 @@
         }
 
     </script>
+
+    <style>
+        .yatra-footer {
+            background: rgba(13, 19, 31, 0.95);
+            color: var(--text-muted);
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+        }
+        .footer-content {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .built-by {
+            margin: 0 0 6px 0;
+            color: var(--text-main);
+            font-size: 11px;
+        }
+        .built-by strong {
+            color: var(--primary);
+        }
+        .ai-power {
+            font-style: italic;
+            color: var(--accent);
+            font-size: 10px;
+        }
+        .footer-bottom {
+            font-size: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 6px;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+    </style>
+    <footer class="yatra-footer">
+        <div class="footer-content">
+            <p class="built-by">
+                Built with ❤️ for <strong>Kedarnath Yatra 2026</strong> by 
+                <strong>District Magistrate Rudraprayag</strong> | 
+                <span class="ai-power">Powered by Open Source AI</span>
+            </p>
+            <div class="footer-bottom">
+                <span>© 2026 <strong>CHANGE TechLab</strong>. All rights reserved.</span>
+                <nav class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="mailto:changetechlab@outlook.com">changetechlab@outlook.com</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
